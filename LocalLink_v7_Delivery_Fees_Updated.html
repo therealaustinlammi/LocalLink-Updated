@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LocalLink Marketplace Prototype</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --green:#2f7d5a;
+  --green-dark:#205b40;
+  --green-soft:#eaf6ef;
+  --cream:#faf7ef;
+  --ink:#1f2933;
+  --muted:#66746e;
+  --line:#dde5e0;
+  --bg:#f4f7f5;
+  --danger:#b84545;
+  --gold:#a66c14;
+}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+}
+button,input,select,textarea{font:inherit}
+.app{
+  max-width:430px;
+  margin:24px auto;
+  background:#fff;
+  min-height:860px;
+  border-radius:28px;
+  box-shadow:0 12px 42px rgba(0,0,0,.12);
+  overflow:hidden;
+  border:1px solid #e5ebe7;
+  position:relative;
+}
+.topbar{
+  padding:16px 18px;
+  border-bottom:1px solid #edf1ef;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  background:#fff;
+  z-index:20;
+}
+.brand{font-size:22px;font-weight:900;letter-spacing:-.4px;cursor:pointer}
+.brand span{color:var(--green)}
+.top-actions{display:flex;align-items:center;gap:8px}
+.icon-btn{
+  border:none;background:#f1f5f3;border-radius:12px;
+  width:38px;height:38px;cursor:pointer;font-size:18px;
+}
+.profile-pill{
+  display:none;align-items:center;gap:6px;background:#eef4f0;
+  color:#244d39;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:800;
+}
+.profile-pill.active{display:flex}
+.screen{display:none;padding:22px 18px 98px}
+.screen.active{display:block}
+h1{font-size:31px;line-height:1.07;margin:14px 0 10px}
+h2{font-size:25px;margin:4px 0 10px}
+h3{font-size:18px;margin:0 0 6px}
+p{color:var(--muted);line-height:1.45}
+.small{font-size:12.5px;color:#77857f}
+.label{font-size:12px;font-weight:900;color:#65746d;text-transform:uppercase;letter-spacing:.55px}
+.hero{
+  background:linear-gradient(135deg,#e8f6ee,#fbf4df);
+  border-radius:24px;padding:24px 19px;margin-top:8px;
+}
+.hero-icon{
+  width:62px;height:62px;border-radius:18px;background:var(--green);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:29px;margin-bottom:15px;
+}
+.btn{
+  width:100%;border:none;border-radius:14px;padding:14px 16px;font-weight:800;
+  cursor:pointer;margin-top:12px;
+}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green-dark)}
+.btn-secondary{background:#eef3f0;color:#234b39}
+.btn-outline{background:#fff;border:1px solid var(--line);color:#2e5141}
+.btn-danger{background:#faeeee;color:var(--danger)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.input, input, select, textarea{
+  width:100%;padding:13px 14px;border:1px solid var(--line);
+  border-radius:13px;background:#fff;margin-top:9px;color:var(--ink);
+}
+textarea{min-height:88px;resize:vertical}
+.card{
+  border:1px solid #e2e9e5;border-radius:18px;padding:15px;background:#fff;margin:12px 0;
+}
+.soft-card{
+  background:#f7faf8;border-radius:16px;padding:14px;margin:12px 0;border:1px solid #edf1ef;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.choice-card{
+  border:1px solid var(--line);border-radius:18px;padding:15px;background:#fff;cursor:pointer;
+}
+.choice-card:hover{border-color:var(--green);background:#f5faf7}
+.choice-card .emoji{font-size:26px;margin-bottom:8px}
+.search-wrap{position:relative}
+.search-wrap input{padding-right:46px}
+.search-btn{
+  position:absolute;right:6px;top:15px;width:34px;height:34px;border:none;border-radius:10px;
+  background:var(--green);color:#fff;cursor:pointer;
+}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin:20px 0 8px}
+.link-btn{border:none;background:none;color:var(--green);font-weight:800;cursor:pointer;padding:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip{
+  padding:9px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;
+  font-size:13px;
+}
+.chip.selected{background:var(--green);color:#fff;border-color:var(--green)}
+.product-card{
+  border:1px solid #e2e8e4;border-radius:18px;padding:12px;background:#fff;position:relative;
+}
+.product-img{
+  height:110px;border-radius:14px;background:linear-gradient(135deg,#eff6f1,#f7eed7);
+  display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:10px;
+}
+.product-name{font-size:15px;font-weight:850;line-height:1.25}
+.vendor{color:var(--green);font-weight:750;font-size:12.5px;margin-top:3px}
+.price{font-weight:900;margin-top:5px}
+.meta{font-size:11.5px;color:#7c8883;margin-top:4px}
+.heart{
+  position:absolute;right:9px;top:9px;width:34px;height:34px;border:none;border-radius:50%;
+  background:rgba(255,255,255,.92);cursor:pointer;font-size:17px;box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+.heart.on{color:#cf4f66}
+.badge{
+  display:inline-block;font-size:11px;font-weight:850;padding:5px 8px;border-radius:999px;
+  background:var(--green-soft);color:var(--green);
+}
+.badge.gold{background:#fff5dc;color:var(--gold)}
+.badge.gray{background:#eef1ef;color:#67736e}
+.badge.red{background:#faeeee;color:var(--danger)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.stack{display:flex;flex-direction:column;gap:8px}
+.divider{height:1px;background:#edf0ee;margin:14px 0}
+.result-card{
+  border:1px solid #e1e7e3;border-radius:18px;padding:15px;margin:12px 0;background:#fff;
+}
+.rank{display:inline-block;font-size:11px;font-weight:900;background:var(--green-soft);color:var(--green);padding:5px 8px;border-radius:999px}
+.score{float:right;font-size:12px;font-weight:900;color:var(--green)}
+.why{background:#f7faf8;border-radius:13px;padding:11px;margin-top:10px;font-size:13px;color:#52605a}
+.progress{height:9px;background:#e9efec;border-radius:99px;overflow:hidden}
+.progress>div{height:100%;background:var(--green)}
+.bottom-nav{
+  position:absolute;bottom:0;left:0;right:0;height:74px;background:#fff;border-top:1px solid #e7ece9;
+  display:none;grid-template-columns:repeat(5,1fr);z-index:30;
+}
+.bottom-nav.show{display:grid}
+.nav-item{
+  border:none;background:#fff;cursor:pointer;color:#74817b;font-size:11px;font-weight:750;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+}
+.nav-item .nav-icon{font-size:20px}
+.nav-item.active{color:var(--green)}
+.count-pill{
+  min-width:19px;height:19px;border-radius:999px;background:var(--green);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;padding:0 5px;
+}
+.filter-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cart-item{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center}
+.cart-thumb{
+  width:58px;height:58px;border-radius:13px;background:#f1f6f3;display:flex;align-items:center;justify-content:center;font-size:28px;
+}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:28px;height:28px;border:none;border-radius:9px;background:#eef3f0;cursor:pointer}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:#f6f8f7;border-radius:14px;padding:12px;text-align:center}
+.stat strong{font-size:20px;display:block}
+.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:4px}
+.tab{white-space:nowrap;padding:9px 11px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:750;font-size:12px}
+.tab.active{background:var(--green);color:#fff;border-color:var(--green)}
+.status-list{display:flex;flex-direction:column;gap:8px}
+.status-step{padding:10px 12px;border-radius:12px;background:#f6f8f7;color:#738079;font-size:13px}
+.status-step.done{background:var(--green-soft);color:var(--green);font-weight:800}
+.notice{padding:12px;border-radius:13px;background:#fff7e7;color:#72500c;font-size:13px;border:1px solid #f2e1b9}
+.success{padding:12px;border-radius:13px;background:#edf8f1;color:#255f42;font-size:13px;border:1px solid #d8eddf}
+.error{padding:12px;border-radius:13px;background:#faeeee;color:#963d3d;font-size:13px;border:1px solid #efd4d4}
+.hidden{display:none!important}
+.role-card{border-left:4px solid var(--green)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:9px 7px;border-bottom:1px solid #edf0ee;vertical-align:top}
+th{color:#69766f}
+.footer-note{text-align:center;font-size:11px;color:#8c9892;padding:0 16px 86px}
+@media(max-width:470px){.app{margin:0;min-height:100vh;border-radius:0;border:none}.screen{min-height:calc(100vh - 74px)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand" onclick="navTo('home')">Local<span>Link</span></div>
+    <div class="top-actions">
+      <button class="icon-btn" onclick="openRoleSwitcher()" title="Demo dashboards">⚙️</button>
+      <div id="profilePill" class="profile-pill">👤 <span id="profileName">Guest</span></div>
+      <button id="signInTop" class="btn btn-secondary" style="width:auto;margin:0;padding:9px 11px;font-size:12px" onclick="showScreen('signin')">Sign in</button>
+    </div>
+  </div>
+
+  <!-- CUSTOMER HOME -->
+  <section id="home" class="screen active">
+    <div class="label">Provo Farmers Market</div>
+    <h1>Shop local without the guesswork.</h1>
+    <p>Discover products from local vendors, build an order, and choose pickup or local delivery.</p>
+
+    <div class="search-wrap">
+      <input id="homeSearch" placeholder="Search products, vendors, or categories..." onkeydown="if(event.key==='Enter') searchFromHome()"/>
+      <button class="search-btn" onclick="searchFromHome()">🔎</button>
+    </div>
+
+    <button class="btn btn-primary" onclick="showScreen('finder')">✨ Ask LocalLink Finder</button>
+
+    <div class="soft-card">
+      <div class="row">
+        <div>
+          <div class="label">Rewards</div>
+          <strong id="homeTier">Seedling</strong>
+          <div class="small"><span id="homeXP">0</span> XP</div>
+        </div>
+        <button class="link-btn" onclick="showScreen('rewards')">View rewards</button>
+      </div>
+      <div class="progress" style="margin-top:10px"><div id="homeXPBar" style="width:0%"></div></div>
+      <div class="small" id="homeXPNext" style="margin-top:6px">100 XP to Sprout</div>
+    </div>
+
+    <div class="hero">
+      <div class="label">Seasonal spotlight</div>
+      <h2 style="margin-top:8px">Fall market favorites 🍂</h2>
+      <p>Small-batch food, warm drinks, handmade home goods, and local seasonal picks.</p>
+      <button class="btn btn-secondary" onclick="openDiscoverWithCategory('Seasonal products')">Shop seasonal</button>
+    </div>
+
+    <div class="section-head"><h3>Categories</h3><button class="link-btn" onclick="navTo('discover')">See all</button></div>
+    <div id="categoryGrid" class="grid3"></div>
+
+    <div class="section-head"><h3>Featured products</h3><button class="link-btn" onclick="navTo('discover')">Browse</button></div>
+    <div id="featuredGrid" class="grid2"></div>
+
+    <div class="section-head"><h3>Featured vendors</h3></div>
+    <div id="featuredVendors"></div>
+
+    <div class="section-head"><h3>New at the market</h3></div>
+    <div id="newGrid" class="grid2"></div>
+
+    <div class="soft-card">
+      <div class="row">
+        <div>
+          <strong>Local delivery</strong>
+          <div class="small">Prototype delivery zone: up to 30 miles from Provo.</div>
+        </div>
+        <span class="badge">30 mi</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCOVER -->
+  <section id="discover" class="screen">
+    <div class="label">Discover</div>
+    <h2>Browse the market</h2>
+    <div class="search-wrap">
+      <input id="discoverSearch" placeholder="Search products..." oninput="renderDiscover()"/>
+      <button class="search-btn" onclick="renderDiscover()">🔎</button>
+    </div>
+
+    <div class="filter-row">
+      <select id="categoryFilter" onchange="renderDiscover()"><option value="">All categories</option></select>
+      <select id="vendorFilter" onchange="renderDiscover()"><option value="">All vendors</option></select>
+      <select id="priceFilter" onchange="renderDiscover()">
+        <option value="">Any price</option>
+        <option value="15">Under $15</option>
+        <option value="30">Under $30</option>
+        <option value="50">Under $50</option>
+      </select>
+      <select id="sortFilter" onchange="renderDiscover()">
+        <option value="popular">Most popular</option>
+        <option value="newest">Newest</option>
+        <option value="low">Price: low to high</option>
+        <option value="high">Price: high to low</option>
+        <option value="rating">Highest rated</option>
+      </select>
+    </div>
+
+    <div class="chips">
+      <button class="chip" data-filter="pickup" onclick="toggleDiscoverChip(this)">Pickup</button>
+      <button class="chip" data-filter="delivery" onclick="toggleDiscoverChip(this)">Delivery</button>
+      <button class="chip" data-filter="vegetarian" onclick="toggleDiscoverChip(this)">Vegetarian</button>
+      <button class="chip" data-filter="vegan" onclick="toggleDiscoverChip(this)">Vegan</button>
+      <button class="chip" data-filter="gluten-free" onclick="toggleDiscoverChip(this)">Gluten-free</button>
+      <button class="chip" data-filter="available" onclick="toggleDiscoverChip(this)">In stock</button>
+    </div>
+
+    <div class="row" style="margin-top:16px"><span id="discoverCount" class="small"></span><button class="link-btn" onclick="clearDiscoverFilters()">Clear filters</button></div>
+    <div id="discoverGrid" class="grid2" style="margin-top:10px"></div>
+  </section>
+
+  <!-- WISHLIST -->
+  <section id="wishlist" class="screen">
+    <div class="label">Wishlist</div>
+    <h2>Saved for later</h2>
+    <div id="wishlistContent"></div>
+  </section>
+
+  <!-- BAG -->
+  <section id="bag" class="screen">
+    <div class="label">Shopping bag</div>
+    <h2>Your order</h2>
+    <div id="bagContent"></div>
+  </section>
+
+  <!-- ACCOUNT -->
+  <section id="account" class="screen">
+    <div class="label">Account</div>
+    <h2 id="accountTitle">Guest shopper</h2>
+    <div id="accountContent"></div>
+  </section>
+
+  <!-- SIGN IN -->
+  <section id="signin" class="screen">
+    <div class="label">Account</div>
+    <h2>Sign in to LocalLink</h2>
+    <p class="small">Prototype only. This stores your demo account in this browser—no real account is created.</p>
+    <div class="card">
+      <label class="small">Name</label>
+      <input id="signinName" placeholder="Your name"/>
+      <label class="small" style="display:block;margin-top:12px">Email</label>
+      <input id="signinEmail" type="email" placeholder="you@example.com"/>
+      <button class="btn btn-primary" onclick="mockSignIn()">Sign in</button>
+      <button class="btn btn-secondary" onclick="continueAsGuest()">Continue as guest</button>
+    </div>
+    <button class="btn btn-outline" onclick="navTo('home')">Back home</button>
+  </section>
+
+  <!-- FINDER -->
+  <section id="finder" class="screen">
+    <div class="label">LocalLink Finder</div>
+    <h2>Tell us what you need</h2>
+    <p>Search naturally or use the guided filters. Recommendations only come from products in this prototype.</p>
+    <textarea id="aiQuery" placeholder="Example: I need a healthy dinner for four under $40, no dairy, pickup tomorrow."></textarea>
+    <button class="btn btn-primary" onclick="runFinder()">Find matches</button>
+    <div class="divider"></div>
+    <h3>Or use guided filters</h3>
+    <select id="finderRecipient">
+      <option>Myself</option><option>Partner / Spouse</option><option>Friend</option><option>Parent</option><option>Coworker</option><option>Someone else</option>
+    </select>
+    <select id="finderOccasion">
+      <option>Just because</option><option>Birthday</option><option>Anniversary</option><option>Thank you</option><option>Holiday</option>
+    </select>
+    <div id="finderInterestChips" class="chips"></div>
+    <input id="finderCustom" placeholder="Type another interest (coffee, plants, spicy, etc.)"/>
+    <select id="finderBudget">
+      <option value="15">Under $15</option>
+      <option value="30" selected>Under $30</option>
+      <option value="50">Under $50</option>
+      <option value="999">$50+</option>
+    </select>
+    <button class="btn btn-secondary" onclick="runGuidedFinder()">Use guided finder</button>
+    <div id="finderResults" style="margin-top:16px"></div>
+  </section>
+
+  <!-- PRODUCT DETAIL -->
+  <section id="product" class="screen">
+    <div id="productDetail"></div>
+  </section>
+
+  <!-- CHECKOUT -->
+  <section id="checkout" class="screen">
+    <div class="label">Checkout</div>
+    <h2>Delivery or pickup</h2>
+    <div id="checkoutContent"></div>
+  </section>
+
+  <!-- ORDER CONFIRM -->
+  <section id="order" class="screen">
+    <div class="label">Order</div>
+    <div id="orderContent"></div>
+  </section>
+
+  <!-- REWARDS -->
+  <section id="rewards" class="screen">
+    <div class="label">LocalLink Rewards</div>
+    <h2>Your market XP</h2>
+    <div id="rewardsContent"></div>
+  </section>
+
+  <!-- ROLE SWITCHER -->
+  <section id="roles" class="screen">
+    <div class="label">Prototype dashboards</div>
+    <h2>View another role</h2>
+    <p class="small">These are demo-only front-end dashboards. They are not secure role-based accounts.</p>
+    <div class="card role-card"><h3>Vendor dashboard</h3><p class="small">Manage products, inventory, hours, and orders.</p><button class="btn btn-secondary" onclick="showScreen('vendorDash')">Open vendor demo</button></div>
+    <div class="card role-card"><h3>Driver dashboard</h3><p class="small">View assigned deliveries and update delivery status.</p><button class="btn btn-secondary" onclick="showScreen('driverDash')">Open driver demo</button></div>
+    <div class="card role-card"><h3>Admin dashboard</h3><p class="small">View vendors, products, orders, delivery settings, and rewards settings.</p><button class="btn btn-secondary" onclick="showScreen('adminDash')">Open admin demo</button></div>
+    <button class="btn btn-outline" onclick="navTo('home')">Back to customer app</button>
+  </section>
+
+  <!-- VENDOR -->
+  <section id="vendorDash" class="screen">
+    <div class="label">Vendor dashboard • Demo</div>
+    <h2>Peak Roast Coffee</h2>
+    <div class="stat-grid">
+      <div class="stat"><strong>7</strong><span class="small">Orders</span></div>
+      <div class="stat"><strong>$186</strong><span class="small">Sales</span></div>
+      <div class="stat"><strong>4.8</strong><span class="small">Rating</span></div>
+    </div>
+    <div class="section-head"><h3>Store status</h3><span class="badge">Open</span></div>
+    <div class="card">
+      <label class="small">Business hours</label>
+      <input value="Saturday 9:00 AM – 2:00 PM"/>
+      <label class="small" style="display:block;margin-top:10px">Preparation time</label>
+      <select><option>15–20 minutes</option><option>20–30 minutes</option><option>30–45 minutes</option></select>
+      <button class="btn btn-secondary" onclick="toast('Vendor settings saved in this demo.')">Save changes</button>
+    </div>
+    <div class="section-head"><h3>Products</h3><button class="link-btn" onclick="toast('Add-product form would open here.')">+ Add product</button></div>
+    <div id="vendorProductList"></div>
+    <div class="section-head"><h3>Incoming orders</h3></div>
+    <div class="card">
+      <div class="row"><strong>#LL-1042</strong><span class="badge gold">Vendor reviewing</span></div>
+      <div class="small">2 items • $41.00 • Pickup</div>
+      <div class="grid2"><button class="btn btn-primary" onclick="toast('Order accepted.')">Accept</button><button class="btn btn-danger" onclick="toast('Order rejected in demo.')">Reject</button></div>
+    </div>
+    <button class="btn btn-outline" onclick="showScreen('roles')">Back</button>
+  </section>
+
+  <!-- DRIVER -->
+  <section id="driverDash" class="screen">
+    <div class="label">Driver dashboard • Demo</div>
+    <h2>Assigned deliveries</h2>
+    <div class="card">
+      <div class="row"><strong>#LL-1039</strong><span class="badge">Assigned</span></div>
+      <p class="small">Pickup: Peak Roast Coffee<br/>Dropoff: Customer address hidden until assigned</p>
+      <div class="status-list">
+        <div class="status-step done">Assigned to driver</div>
+        <div class="status-step">Picked up from vendor</div>
+        <div class="status-step">Out for delivery</div>
+        <div class="status-step">Delivered</div>
+      </div>
+      <button class="btn btn-primary" onclick="advanceDriverStatus(this)">Advance delivery status</button>
+    </div>
+    <button class="btn btn-outline" onclick="showScreen('roles')">Back</button>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="adminDash" class="screen">
+    <div class="label">Admin dashboard • Demo</div>
+    <h2>Market overview</h2>
+    <div class="stat-grid">
+      <div class="stat"><strong>24</strong><span class="small">Vendors</span></div>
+      <div class="stat"><strong id="adminOrders">0</strong><span class="small">Orders</span></div>
+      <div class="stat"><strong id="adminSales">$0</strong><span class="small">Demo sales</span></div>
+    </div>
+    <div class="section-head"><h3>Delivery settings</h3></div>
+    <div class="card">
+      <label class="small">Max delivery radius (miles)</label><input id="adminRadius" type="number" value="30"/>
+      <label class="small" style="display:block;margin-top:10px">Free-delivery threshold</label><input id="adminFreeDeliveryThreshold" type="number" value="60"/>
+      <p class="small">Customer delivery fees use the fixed distance bands shown at checkout. Admin sees only the fee charged to the customer.</p>
+      <button class="btn btn-secondary" onclick="saveAdminSettings()">Save settings</button>
+    </div>
+    <div class="section-head"><h3>Rewards settings</h3></div>
+    <div class="card">
+      <label class="small">XP per $1 spent</label><input id="adminXpRate" type="number" value="1"/>
+      <button class="btn btn-secondary" onclick="saveAdminSettings()">Save rewards</button>
+    </div>
+    <div class="section-head"><h3>Orders</h3></div>
+    <div id="adminOrderFees"></div>
+    <div class="section-head"><h3>Vendors</h3></div>
+    <table><thead><tr><th>Vendor</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminVendorTable"></tbody></table>
+    <button class="btn btn-outline" onclick="showScreen('roles')">Back</button>
+  </section>
+
+  <div id="toast" style="position:absolute;left:18px;right:18px;bottom:86px;background:#1f2933;color:#fff;padding:12px 14px;border-radius:13px;display:none;z-index:50;font-size:13px"></div>
+
+  <nav id="bottomNav" class="bottom-nav show">
+    <button class="nav-item active" data-nav="home" onclick="navTo('home')"><span class="nav-icon">🏠</span>Home</button>
+    <button class="nav-item" data-nav="discover" onclick="navTo('discover')"><span class="nav-icon">🔎</span>Discover</button>
+    <button class="nav-item" data-nav="wishlist" onclick="navTo('wishlist')"><span class="nav-icon">♡</span>Wishlist</button>
+    <button class="nav-item" data-nav="bag" onclick="navTo('bag')"><span class="nav-icon">🛍️</span>Bag <span id="bagCount" class="count-pill hidden">0</span></button>
+    <button class="nav-item" data-nav="account" onclick="navTo('account')"><span class="nav-icon">👤</span>Account</button>
+  </nav>
+</div>
+
+<script>
+const categories = [
+  ['Produce','🥕'],['Meat','🥩'],['Dairy','🥛'],['Eggs','🥚'],['Baked goods','🥐'],
+  ['Prepared meals','🍲'],['Drinks','☕'],['Sauces and spreads','🍯'],['Crafts','🎨'],
+  ['Plants and flowers','🌿'],['Health and wellness','🧼'],['Seasonal products','🍂']
+];
+
+const vendors = [
+  {id:'peak',name:'Peak Roast Coffee',category:'Drinks',rating:4.8,distance:3.2,hours:'Sat 9–2',approved:true,emoji:'☕'},
+  {id:'petals',name:'Provo Petals',category:'Plants and flowers',rating:4.9,distance:2.8,hours:'Sat 8–2',approved:true,emoji:'💐'},
+  {id:'berry',name:'Bee & Berry Market',category:'Sauces and spreads',rating:4.7,distance:4.1,hours:'Sat 9–2',approved:true,emoji:'🍯'},
+  {id:'cookie',name:'Utah Cookie Co.',category:'Baked goods',rating:4.8,distance:5.0,hours:'Sat 9–2',approved:true,emoji:'🍪'},
+  {id:'juniper',name:'Juniper Jewelry',category:'Crafts',rating:4.9,distance:3.8,hours:'Sat 9–2',approved:true,emoji:'💍'},
+  {id:'mountain',name:'Mountain Line Studio',category:'Crafts',rating:4.6,distance:6.1,hours:'Sat 9–2',approved:true,emoji:'🖼️'},
+  {id:'redrock',name:'Red Rock Pottery',category:'Crafts',rating:4.8,distance:7.0,hours:'Sat 9–2',approved:true,emoji:'🏺'},
+  {id:'alpine',name:'Alpine Botanicals',category:'Health and wellness',rating:4.7,distance:8.4,hours:'Sat 9–1',approved:true,emoji:'🧼'},
+  {id:'summit',name:'Summit Snacks Utah',category:'Prepared meals',rating:4.5,distance:9.2,hours:'Sat 9–2',approved:true,emoji:'🥨'},
+  {id:'leaf',name:'Little Leaf Market',category:'Plants and flowers',rating:4.9,distance:4.9,hours:'Sat 8–2',approved:true,emoji:'🪴'},
+  {id:'river',name:'Riverstone Bakery',category:'Baked goods',rating:4.8,distance:2.4,hours:'Sat 8–1',approved:true,emoji:'🥖'},
+  {id:'blue',name:'Blue Sage Tea Co.',category:'Drinks',rating:4.6,distance:4.0,hours:'Sat 9–2',approved:true,emoji:'🍵'}
+];
+
+const products = [
+  {id:'coffee1',name:'Small-Batch Coffee Gift Bag',vendorId:'peak',price:19,category:'Drinks',emoji:'☕',featured:true,new:true,popularity:96,rating:4.8,stock:18,pickup:true,delivery:true,prep:15,dietary:['vegan','gluten-free'],ingredients:['100% roasted coffee beans'],allergens:[],tags:['coffee','beans','gift','drink'],seasonal:false},
+  {id:'flowers1',name:'Seasonal Flower Bouquet',vendorId:'petals',price:28,category:'Plants and flowers',emoji:'💐',featured:true,new:false,popularity:93,rating:4.9,stock:9,pickup:true,delivery:true,prep:20,dietary:[],ingredients:[],allergens:[],tags:['flowers','bouquet','gift','home'],seasonal:true},
+  {id:'honey1',name:'Local Honey + Mini Jam Set',vendorId:'berry',price:18,category:'Sauces and spreads',emoji:'🍯',featured:true,new:false,popularity:88,rating:4.7,stock:14,pickup:true,delivery:true,prep:10,dietary:['gluten-free'],ingredients:['local honey','berry jam'],allergens:[],tags:['honey','jam','food','sweet'],seasonal:false},
+  {id:'cookies1',name:'Gourmet Cookie Box',vendorId:'cookie',price:20,category:'Baked goods',emoji:'🍪',featured:true,new:true,popularity:99,rating:4.8,stock:22,pickup:true,delivery:true,prep:20,dietary:[],ingredients:['flour','butter','sugar','eggs','chocolate'],allergens:['wheat','milk','eggs'],tags:['cookies','dessert','sweet','gift'],seasonal:false},
+  {id:'necklace1',name:'Minimalist Sterling Necklace',vendorId:'juniper',price:42,category:'Crafts',emoji:'💍',featured:false,new:true,popularity:82,rating:4.9,stock:7,pickup:true,delivery:false,prep:10,dietary:[],ingredients:[],allergens:[],tags:['jewelry','necklace','silver','handmade'],seasonal:false},
+  {id:'print1',name:'Utah Landscape Art Print',vendorId:'mountain',price:25,category:'Crafts',emoji:'🖼️',featured:false,new:false,popularity:76,rating:4.6,stock:11,pickup:true,delivery:true,prep:10,dietary:[],ingredients:[],allergens:[],tags:['art','utah','mountains','home'],seasonal:true},
+  {id:'mug1',name:'Handmade Ceramic Mug',vendorId:'redrock',price:30,category:'Crafts',emoji:'🏺',featured:true,new:false,popularity:89,rating:4.8,stock:6,pickup:true,delivery:true,prep:10,dietary:[],ingredients:[],allergens:[],tags:['mug','pottery','ceramic','coffee','home'],seasonal:false},
+  {id:'soap1',name:'Natural Soap & Balm Set',vendorId:'alpine',price:16,category:'Health and wellness',emoji:'🧼',featured:false,new:true,popularity:74,rating:4.7,stock:16,pickup:true,delivery:true,prep:10,dietary:[],ingredients:['plant oils','beeswax','essential oils'],allergens:['fragrance varies'],tags:['soap','balm','self-care','wellness'],seasonal:false},
+  {id:'snack1',name:'Trail Snack Variety Pack',vendorId:'summit',price:17,category:'Prepared meals',emoji:'🥨',featured:false,new:false,popularity:81,rating:4.5,stock:20,pickup:true,delivery:true,prep:10,dietary:['vegetarian'],ingredients:['nuts','dried fruit','pretzels'],allergens:['nuts','wheat'],tags:['snacks','trail','hiking','food'],seasonal:false},
+  {id:'plant1',name:'Mini Succulent Planter',vendorId:'leaf',price:15,category:'Plants and flowers',emoji:'🪴',featured:false,new:true,popularity:85,rating:4.9,stock:12,pickup:true,delivery:false,prep:10,dietary:[],ingredients:[],allergens:[],tags:['plant','succulent','home','gift'],seasonal:false},
+  {id:'bread1',name:'Artisan Sourdough Loaf',vendorId:'river',price:9,category:'Baked goods',emoji:'🥖',featured:true,new:false,popularity:95,rating:4.8,stock:15,pickup:true,delivery:true,prep:25,dietary:['vegetarian'],ingredients:['flour','water','salt','starter'],allergens:['wheat'],tags:['bread','sourdough','bakery','food'],seasonal:false},
+  {id:'tea1',name:'Loose-Leaf Herbal Tea Set',vendorId:'blue',price:23,category:'Drinks',emoji:'🍵',featured:false,new:true,popularity:79,rating:4.6,stock:10,pickup:true,delivery:true,prep:10,dietary:['vegan','gluten-free'],ingredients:['herbal tea blends'],allergens:[],tags:['tea','herbal','drink','relaxation'],seasonal:true},
+  {id:'meal1',name:'Farmhouse Veggie Dinner Kit',vendorId:'summit',price:34,category:'Prepared meals',emoji:'🍲',featured:true,new:true,popularity:91,rating:4.7,stock:8,pickup:true,delivery:true,prep:30,dietary:['vegetarian'],ingredients:['seasonal vegetables','rice','herbs','olive oil'],allergens:[],tags:['dinner','healthy','meal','family'],seasonal:true},
+  {id:'jam1',name:'Autumn Apple Butter',vendorId:'berry',price:12,category:'Sauces and spreads',emoji:'🍎',featured:false,new:true,popularity:80,rating:4.8,stock:13,pickup:true,delivery:true,prep:10,dietary:['vegan','gluten-free'],ingredients:['apples','cinnamon','sugar'],allergens:[],tags:['apple','spread','fall','seasonal'],seasonal:true},
+  {id:'eggs1',name:'Farm Fresh Dozen Eggs',vendorId:'river',price:7,category:'Eggs',emoji:'🥚',featured:false,new:false,popularity:92,rating:4.8,stock:20,pickup:true,delivery:true,prep:10,dietary:['gluten-free'],ingredients:['eggs'],allergens:['eggs'],tags:['eggs','breakfast','farm'],seasonal:false},
+  {id:'milk1',name:'Local Whole Milk',vendorId:'river',price:6,category:'Dairy',emoji:'🥛',featured:false,new:false,popularity:68,rating:4.6,stock:10,pickup:true,delivery:true,prep:10,dietary:['gluten-free'],ingredients:['milk'],allergens:['milk'],tags:['milk','dairy','local'],seasonal:false},
+  {id:'produce1',name:'Seasonal Produce Box',vendorId:'leaf',price:24,category:'Produce',emoji:'🥕',featured:true,new:false,popularity:90,rating:4.8,stock:9,pickup:true,delivery:true,prep:20,dietary:['vegan','gluten-free'],ingredients:['seasonal vegetables and fruit'],allergens:[],tags:['produce','vegetables','fruit','healthy'],seasonal:true},
+  {id:'meat1',name:'Grass-Fed Beef Bundle',vendorId:'summit',price:48,category:'Meat',emoji:'🥩',featured:false,new:false,popularity:77,rating:4.7,stock:5,pickup:true,delivery:true,prep:20,dietary:['gluten-free'],ingredients:['beef'],allergens:[],tags:['beef','meat','protein'],seasonal:false}
+];
+
+const state = {
+  user:null,
+  guest:true,
+  wishlist:[],
+  cart:[],
+  xp:0,
+  xpHistory:[],
+  orders:[],
+  activeProduct:null,
+  discoverFilters:new Set(),
+  settings:{maxMiles:30,baseFee:5,perMile:.75,xpRate:1,freeDeliveryThreshold:60},
+  checkout:{method:'pickup',distance:0,address:'',pickupTime:'Saturday 12:00 PM',useDeliveryCredit:false}
+};
+
+function save(){
+  try{
+    localStorage.setItem('locallinkPrototype', JSON.stringify({
+      user:state.user,guest:state.guest,wishlist:state.wishlist,cart:state.cart,xp:state.xp,
+      xpHistory:state.xpHistory,orders:state.orders,settings:state.settings,checkout:state.checkout
+    }));
+  }catch(e){}
+}
+function load(){
+  try{
+    const d=JSON.parse(localStorage.getItem('locallinkPrototype')||'null');
+    if(d) Object.assign(state,d);
+    state.settings = Object.assign({maxMiles:30,baseFee:5,perMile:.75,xpRate:1,freeDeliveryThreshold:60}, state.settings||{});
+    state.checkout = Object.assign({method:'pickup',distance:0,address:'',pickupTime:'Saturday 12:00 PM',useDeliveryCredit:false}, state.checkout||{});
+    if(state.user && typeof state.user.deliveryCredits!=='number') state.user.deliveryCredits=1;
+  }catch(e){}
+}
+function vendorFor(p){return vendors.find(v=>v.id===p.vendorId)}
+function money(n){return '$'+Number(n).toFixed(2)}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
+  clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.style.display='none',2200);
+}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id); if(el) el.classList.add('active');
+  document.getElementById('bottomNav').classList.toggle('show',['home','discover','wishlist','bag','account'].includes(id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function navTo(id){
+  showScreen(id);
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.nav===id));
+  if(id==='home') renderHome();
+  if(id==='discover') renderDiscover();
+  if(id==='wishlist') renderWishlist();
+  if(id==='bag') renderBag();
+  if(id==='account') renderAccount();
+}
+function setAuthUI(){
+  const signed=!!state.user;
+  document.getElementById('signInTop').style.display=signed?'none':'block';
+  document.getElementById('profilePill').classList.toggle('active',signed);
+  if(signed) document.getElementById('profileName').textContent=state.user.name;
+}
+function mockSignIn(){
+  const name=document.getElementById('signinName').value.trim()||'Local Shopper';
+  const email=document.getElementById('signinEmail').value.trim()||'shopper@example.com';
+  state.user={name,email,phone:'',addresses:[],dietary:[],allergies:[],notifications:true,deliveryCredits:1};
+  state.guest=false;save();setAuthUI();navTo('home');toast('Signed in for this prototype.');
+}
+function continueAsGuest(){state.user=null;state.guest=true;save();setAuthUI();navTo('home');toast('Continuing as guest.');}
+function signOut(){state.user=null;state.guest=true;save();setAuthUI();navTo('home');toast('Signed out.');}
+
+function categoryEmoji(cat){return (categories.find(c=>c[0]===cat)||['','🛍️'])[1]}
+function productCard(p){
+  const v=vendorFor(p), on=state.wishlist.includes(p.id);
+  return `<div class="product-card">
+    <button class="heart ${on?'on':''}" onclick="event.stopPropagation();toggleWishlist('${p.id}')">${on?'♥':'♡'}</button>
+    <div onclick="openProduct('${p.id}')">
+      <div class="product-img">${p.emoji}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="vendor">${v.name}</div>
+      <div class="row"><div class="price">${money(p.price)}</div><span class="badge gray">${p.rating}★</span></div>
+      <div class="meta">${p.stock>0?'In stock':'Unavailable'} • ${p.pickup?'Pickup':''}${p.delivery?' + delivery':''}</div>
+    </div>
+  </div>`;
+}
+function renderHome(){
+  document.getElementById('categoryGrid').innerHTML=categories.slice(0,6).map(c=>`<div class="choice-card" onclick="openDiscoverWithCategory('${c[0]}')"><div class="emoji">${c[1]}</div><strong style="font-size:12px">${c[0]}</strong></div>`).join('');
+  document.getElementById('featuredGrid').innerHTML=products.filter(p=>p.featured).slice(0,6).map(productCard).join('');
+  document.getElementById('newGrid').innerHTML=products.filter(p=>p.new).slice(0,4).map(productCard).join('');
+  document.getElementById('featuredVendors').innerHTML=vendors.slice(0,4).map(v=>`<div class="card"><div class="row"><div><strong>${v.emoji} ${v.name}</strong><div class="small">${v.category} • ${v.rating}★ • ${v.distance} mi</div></div><span class="badge">Featured</span></div></div>`).join('');
+  renderRewardsMini();
+}
+function searchFromHome(){
+  document.getElementById('discoverSearch').value=document.getElementById('homeSearch').value;
+  navTo('discover');
+}
+function openDiscoverWithCategory(cat){
+  navTo('discover');
+  document.getElementById('categoryFilter').value=cat;
+  renderDiscover();
+}
+function populateFilters(){
+  document.getElementById('categoryFilter').innerHTML='<option value="">All categories</option>'+categories.map(c=>`<option>${c[0]}</option>`).join('');
+  document.getElementById('vendorFilter').innerHTML='<option value="">All vendors</option>'+vendors.map(v=>`<option value="${v.id}">${v.name}</option>`).join('');
+}
+function toggleDiscoverChip(el){
+  const f=el.dataset.filter;
+  if(state.discoverFilters.has(f)){state.discoverFilters.delete(f);el.classList.remove('selected')}
+  else{state.discoverFilters.add(f);el.classList.add('selected')}
+  renderDiscover();
+}
+function clearDiscoverFilters(){
+  document.getElementById('discoverSearch').value='';
+  document.getElementById('categoryFilter').value='';
+  document.getElementById('vendorFilter').value='';
+  document.getElementById('priceFilter').value='';
+  state.discoverFilters.clear();
+  document.querySelectorAll('#discover .chip').forEach(c=>c.classList.remove('selected'));
+  renderDiscover();
+}
+function renderDiscover(){
+  let list=[...products];
+  const q=document.getElementById('discoverSearch').value.trim().toLowerCase();
+  const cat=document.getElementById('categoryFilter').value;
+  const ven=document.getElementById('vendorFilter').value;
+  const max=Number(document.getElementById('priceFilter').value||0);
+  if(q) list=list.filter(p=>[p.name,vendorFor(p).name,p.category,...p.tags,...p.dietary,...p.allergens].join(' ').toLowerCase().includes(q));
+  if(cat) list=list.filter(p=>p.category===cat);
+  if(ven) list=list.filter(p=>p.vendorId===ven);
+  if(max) list=list.filter(p=>p.price<=max);
+  for(const f of state.discoverFilters){
+    if(f==='pickup') list=list.filter(p=>p.pickup);
+    if(f==='delivery') list=list.filter(p=>p.delivery);
+    if(f==='available') list=list.filter(p=>p.stock>0);
+    if(['vegetarian','vegan','gluten-free'].includes(f)) list=list.filter(p=>p.dietary.includes(f));
+  }
+  const sort=document.getElementById('sortFilter').value;
+  if(sort==='popular') list.sort((a,b)=>b.popularity-a.popularity);
+  if(sort==='newest') list.sort((a,b)=>(b.new?1:0)-(a.new?1:0));
+  if(sort==='low') list.sort((a,b)=>a.price-b.price);
+  if(sort==='high') list.sort((a,b)=>b.price-a.price);
+  if(sort==='rating') list.sort((a,b)=>b.rating-a.rating);
+  document.getElementById('discoverCount').textContent=`${list.length} product${list.length===1?'':'s'}`;
+  document.getElementById('discoverGrid').innerHTML=list.length?list.map(productCard).join(''):'<div class="soft-card" style="grid-column:1/-1">No products match those filters.</div>';
+}
+function toggleWishlist(id){
+  const i=state.wishlist.indexOf(id);
+  if(i>=0){state.wishlist.splice(i,1);toast('Removed from wishlist.')}
+  else{state.wishlist.push(id);toast('Saved to wishlist.')}
+  save();renderHome();renderDiscover();
+  if(document.getElementById('wishlist').classList.contains('active')) renderWishlist();
+  if(state.activeProduct===id) renderProduct(id);
+}
+function renderWishlist(){
+  const list=state.wishlist.map(id=>products.find(p=>p.id===id)).filter(Boolean);
+  document.getElementById('wishlistContent').innerHTML=list.length?`<div class="grid2">${list.map(productCard).join('')}</div>`:
+  '<div class="soft-card"><strong>Your wishlist is empty.</strong><p class="small">Save products while browsing and they’ll appear here.</p><button class="btn btn-secondary" onclick="navTo(\'discover\')">Discover products</button></div>';
+}
+function addToCart(id,qty=1){
+  const p=products.find(x=>x.id===id); if(!p||p.stock<=0){toast('This product is unavailable.');return}
+  const item=state.cart.find(x=>x.id===id);
+  if(item)item.qty=Math.min(item.qty+qty,p.stock); else state.cart.push({id,qty});
+  save();updateBagCount();toast('Added to bag.');
+}
+function updateBagCount(){
+  const n=state.cart.reduce((a,b)=>a+b.qty,0), el=document.getElementById('bagCount');
+  el.textContent=n;el.classList.toggle('hidden',!n);
+}
+function openProduct(id){state.activeProduct=id;renderProduct(id);showScreen('product')}
+function renderProduct(id){
+  const p=products.find(x=>x.id===id),v=vendorFor(p); if(!p)return;
+  document.getElementById('productDetail').innerHTML=`
+    <button class="link-btn" onclick="navTo('discover')">← Back to discover</button>
+    <div class="product-img" style="height:190px;font-size:72px;margin-top:14px">${p.emoji}</div>
+    <div class="row"><div><div class="label">${p.category}</div><h2>${p.name}</h2></div><button class="heart ${state.wishlist.includes(p.id)?'on':''}" style="position:static" onclick="toggleWishlist('${p.id}')">${state.wishlist.includes(p.id)?'♥':'♡'}</button></div>
+    <div class="vendor">${v.name} • ${v.rating}★</div>
+    <div class="price" style="font-size:22px">${money(p.price)}</div>
+    <div class="chips"><span class="badge">${p.pickup?'Pickup available':'No pickup'}</span><span class="badge">${p.delivery?'Delivery available':'No delivery'}</span><span class="badge gray">${p.prep} min prep</span></div>
+    <div class="card"><strong>Product details</strong><p class="small">Availability: ${p.stock>0?`${p.stock} in stock`:'Unavailable'}<br/>Vendor hours: ${v.hours}<br/>Approx. vendor distance: ${v.distance} mi</p></div>
+    <div class="card"><strong>Ingredients</strong><p class="small">${p.ingredients.length?p.ingredients.join(', '):'Ingredient information unavailable / not applicable.'}</p><strong>Allergens</strong><p class="small">${p.allergens.length?p.allergens.join(', '):'No listed allergens in prototype data.'}</p></div>
+    <div class="card"><strong>Dietary tags</strong><p class="small">${p.dietary.length?p.dietary.join(', '):'No dietary tags listed.'}</p></div>
+    <button class="btn btn-primary" ${p.stock<=0?'disabled':''} onclick="addToCart('${p.id}')">Add to bag • ${money(p.price)}</button>`;
+}
+function bagTotals(){
+  const subtotal=state.cart.reduce((sum,i)=>{const p=products.find(x=>x.id===i.id);return sum+(p?p.price*i.qty:0)},0);
+  return {subtotal};
+}
+function renderBag(){
+  const box=document.getElementById('bagContent');
+  if(!state.cart.length){box.innerHTML='<div class="soft-card"><strong>Your bag is empty.</strong><p class="small">Add products from Discover or the Finder.</p><button class="btn btn-secondary" onclick="navTo(\'discover\')">Start shopping</button></div>';return}
+  const items=state.cart.map(i=>{const p=products.find(x=>x.id===i.id),v=vendorFor(p);return `<div class="card cart-item">
+    <div class="cart-thumb">${p.emoji}</div>
+    <div><strong>${p.name}</strong><div class="small">${v.name}</div><div class="price">${money(p.price)}</div><div class="qty"><button onclick="changeQty('${p.id}',-1)">−</button><span>${i.qty}</span><button onclick="changeQty('${p.id}',1)">+</button></div></div>
+    <button class="link-btn" onclick="removeFromCart('${p.id}')">Remove</button>
+  </div>`}).join('');
+  const {subtotal}=bagTotals();
+  box.innerHTML=items+`<div class="soft-card">
+    <div class="row"><span>Subtotal</span><strong>${money(subtotal)}</strong></div>
+    <div class="small" style="margin-top:6px">Delivery fees, discounts, and rewards are calculated at checkout.</div>
+  </div><button class="btn btn-primary" onclick="renderCheckout();showScreen('checkout')">Continue to checkout</button>`;
+}
+function changeQty(id,d){
+  const item=state.cart.find(x=>x.id===id),p=products.find(x=>x.id===id); if(!item)return;
+  item.qty=Math.max(1,Math.min(p.stock,item.qty+d));save();updateBagCount();renderBag();
+}
+function removeFromCart(id){state.cart=state.cart.filter(x=>x.id!==id);save();updateBagCount();renderBag()}
+function cartSupports(method){return state.cart.every(i=>products.find(p=>p.id===i.id)[method])}
+
+// One source of truth for customer-facing delivery pricing.
+// Distance is the manual prototype mileage from the Provo Farmers Market reference point.
+function calculateDeliveryQuote(distance, subtotal, useCredit=false){
+  const miles=Number(distance);
+  const maxMiles=Number(state.settings.maxMiles||30);
+  const freeThreshold=Number(state.settings.freeDeliveryThreshold||60);
+
+  if(!Number.isFinite(miles) || miles<=0){
+    return {valid:false,eligible:false,fee:null,baseFee:null,reason:'Enter a delivery distance greater than 0 miles.'};
+  }
+  if(miles>maxMiles){
+    return {valid:true,eligible:false,fee:null,baseFee:null,reason:`Delivery is limited to ${maxMiles} miles from Provo Farmers Market.`};
+  }
+
+  let baseFee;
+  if(miles<=3) baseFee=2.99;
+  else if(miles<=5) baseFee=4.99;
+  else if(miles<=7) baseFee=6.99;
+  else baseFee=7 + (Math.floor(miles-7)*0.25);
+
+  baseFee=Math.round(baseFee*100)/100;
+
+  const thresholdFree=Number(subtotal)>=freeThreshold;
+  const creditAvailable=!!(state.user && Number(state.user.deliveryCredits||0)>0);
+  const creditFree=!thresholdFree && useCredit && creditAvailable;
+  const fee=(thresholdFree||creditFree)?0:baseFee;
+
+  return {
+    valid:true,eligible:true,fee,baseFee,
+    thresholdFree,creditFree,creditAvailable,
+    reason:thresholdFree
+      ? `Free delivery on orders of ${money(freeThreshold)} or more.`
+      : creditFree
+        ? 'Free-delivery credit applied.'
+        : 'Delivery fee is based on distance from Provo Farmers Market.'
+  };
+}
+
+function renderCheckout(){
+  const {subtotal}=bagTotals();
+  const method=state.checkout.method;
+  const canDelivery=cartSupports('delivery');
+  const canPickup=cartSupports('pickup');
+  const distance=Number(state.checkout.distance||0);
+  const quote=calculateDeliveryQuote(distance,subtotal,state.checkout.useDeliveryCredit);
+  const deliveryReady=method==='delivery' && canDelivery && quote.eligible;
+  const deliveryFee=deliveryReady?quote.fee:0;
+  const serviceFee=subtotal?Math.max(1.5,subtotal*.03):0;
+  const total=subtotal+deliveryFee+serviceFee;
+  const credits=state.user?Number(state.user.deliveryCredits||0):0;
+
+  document.getElementById('checkoutContent').innerHTML=`
+    <div class="tabs">
+      <button class="tab ${method==='pickup'?'active':''}" onclick="state.checkout.method='pickup';save();renderCheckout()">Pickup</button>
+      <button class="tab ${method==='delivery'?'active':''}" onclick="state.checkout.method='delivery';save();renderCheckout()">Delivery</button>
+    </div>
+    ${method==='pickup'?`
+      <div class="card">
+        <strong>Pickup</strong>
+        <p class="small">Provo Farmers Market / participating vendor booth</p>
+        <label class="small">Pickup time</label>
+        <select onchange="state.checkout.pickupTime=this.value;save()">
+          <option>Saturday 11:00 AM</option><option selected>Saturday 12:00 PM</option><option>Saturday 1:00 PM</option>
+        </select>
+        ${!canPickup?'<div class="error" style="margin-top:10px">One or more items are not available for pickup.</div>':''}
+      </div>`:`
+      <div class="card">
+        <strong>Delivery address</strong>
+        <input placeholder="Street address" value="${state.checkout.address||''}" oninput="state.checkout.address=this.value;save()"/>
+        <label class="small" style="display:block;margin-top:10px">Prototype distance from Provo Farmers Market (miles)</label>
+        <input type="number" min="0" max="${state.settings.maxMiles}" step=".1" value="${distance||''}" placeholder="Example: 8.5" oninput="state.checkout.distance=this.value;save();renderCheckout()"/>
+        <p class="small">This prototype uses manual mileage because no map service is configured. Enter the distance from Provo Farmers Market.</p>
+        ${!quote.valid?`<div class="error">${quote.reason}</div>`:''}
+        ${quote.valid&&!quote.eligible?`<div class="error">${quote.reason} Pickup is still available.</div>`:''}
+        ${!canDelivery?'<div class="error">One or more products in your bag are pickup-only.</div>':''}
+        ${quote.eligible&&canDelivery?`<div class="success">Delivery eligible • Fee before discounts: ${money(quote.baseFee)} • Estimated arrival 45–75 minutes after vendor preparation.</div>`:''}
+        ${state.user&&quote.eligible&&canDelivery?`
+          <div class="soft-card" style="margin-top:10px">
+            <div class="row">
+              <div><strong>Free-delivery credit</strong><div class="small">${credits} credit${credits===1?'':'s'} available</div></div>
+              <input type="checkbox" style="width:auto;margin:0" ${state.checkout.useDeliveryCredit?'checked':''} ${credits<=0||subtotal>=state.settings.freeDeliveryThreshold?'disabled':''}
+                onchange="state.checkout.useDeliveryCredit=this.checked;save();renderCheckout()"/>
+            </div>
+            ${subtotal>=state.settings.freeDeliveryThreshold?`<div class="small" style="margin-top:7px">No credit needed—this order already qualifies for free delivery.</div>`:''}
+          </div>`:''}
+      </div>`}
+    <div class="soft-card">
+      <div class="row"><span>Subtotal</span><strong>${money(subtotal)}</strong></div>
+      ${method==='delivery'?`<div class="row" style="margin-top:7px"><span>Delivery fee</span><strong>${quote.eligible&&canDelivery?money(deliveryFee):'—'}</strong></div>`:''}
+      ${method==='delivery'&&quote.eligible&&canDelivery&&deliveryFee===0?`<div class="small" style="margin-top:4px">${quote.reason}</div>`:''}
+      <div class="row" style="margin-top:7px"><span>Service fee</span><strong>${money(serviceFee)}</strong></div>
+      <div class="divider"></div>
+      <div class="row"><strong>Total</strong><strong>${method==='delivery'&&!deliveryReady?'—':money(total)}</strong></div>
+      <div class="small" style="margin-top:7px">Estimated XP after verified payment: ${Math.floor(subtotal*state.settings.xpRate)} XP</div>
+    </div>
+    <div class="notice"><strong>Payment demo:</strong> This prototype does not process PayPal or mark an order as paid. Use “Create demo unpaid order” below to test the order flow without pretending a payment occurred.</div>
+    <button class="btn btn-primary" ${method==='pickup'&&!canPickup?'disabled':''} ${method==='delivery'&&!deliveryReady?'disabled':''} onclick="createDemoOrder()">Create demo unpaid order</button>
+    <button class="btn btn-outline" onclick="navTo('bag')">Back to bag</button>`;
+}
+function createDemoOrder(){
+  const {subtotal}=bagTotals();
+  const distance=Number(state.checkout.distance||0);
+  const method=state.checkout.method;
+  const quote=calculateDeliveryQuote(distance,subtotal,state.checkout.useDeliveryCredit);
+
+  if(method==='delivery' && (!cartSupports('delivery') || !quote.eligible)){
+    toast('Enter a valid delivery distance within 30 miles before placing the order.');
+    renderCheckout();
+    return;
+  }
+
+  const deliveryFee=method==='delivery'?quote.fee:0;
+  const serviceFee=Math.max(1.5,subtotal*.03);
+  const usedDeliveryCredit=method==='delivery' && quote.creditFree;
+
+  const order={
+    id:'LL-'+String(1000+state.orders.length+1),
+    created:new Date().toLocaleString(),
+    items:state.cart.map(i=>({...i})),
+    subtotal,deliveryFee,serviceFee,total:subtotal+deliveryFee+serviceFee,
+    deliveryDistance:method==='delivery'?distance:null,
+    usedDeliveryCredit,
+    method,status:'Pending payment',paid:false
+  };
+
+  if(usedDeliveryCredit && state.user){
+    state.user.deliveryCredits=Math.max(0,Number(state.user.deliveryCredits||0)-1);
+  }
+
+  state.orders.unshift(order);
+  state.cart=[];
+  state.checkout.useDeliveryCredit=false;
+  save();
+  updateBagCount();
+  renderOrder(order);
+  showScreen('order');
+}
+function renderOrder(o){
+  document.getElementById('orderContent').innerHTML=`
+    <h2>Demo order ${o.id}</h2>
+    <div class="notice">No payment was processed. This order remains <strong>Pending payment</strong>.</div>
+    <div class="card"><div class="row"><strong>Status</strong><span class="badge gold">${o.status}</span></div><p class="small">${o.created}<br/>${o.method==='delivery'?'Delivery':'Pickup'} • ${money(o.total)}</p></div>
+    <div class="status-list">
+      <div class="status-step done">Pending payment</div>
+      <div class="status-step">Paid</div><div class="status-step">Vendor reviewing</div><div class="status-step">Preparing</div><div class="status-step">${o.method==='delivery'?'Ready for delivery':'Ready for pickup'}</div><div class="status-step">${o.method==='delivery'?'Delivered':'Picked up'}</div>
+    </div>
+    <button class="btn btn-primary" onclick="navTo('account')">View orders in account</button>`;
+}
+
+function renderAccount(){
+  const box=document.getElementById('accountContent');
+  if(!state.user){
+    document.getElementById('accountTitle').textContent='Guest shopper';
+    box.innerHTML=`<div class="soft-card"><strong>You’re shopping as a guest.</strong><p class="small">Sign in to demo saved profile information and preferences.</p><button class="btn btn-primary" onclick="showScreen('signin')">Sign in</button></div>${orderHistoryHtml()}`;
+    return;
+  }
+  document.getElementById('accountTitle').textContent=state.user.name;
+  box.innerHTML=`
+    <div class="card">
+      <label class="small">Name</label><input value="${state.user.name}" onchange="state.user.name=this.value;save();setAuthUI()"/>
+      <label class="small" style="display:block;margin-top:10px">Email</label><input value="${state.user.email}" onchange="state.user.email=this.value;save()"/>
+      <label class="small" style="display:block;margin-top:10px">Phone</label><input value="${state.user.phone||''}" placeholder="Phone number" onchange="state.user.phone=this.value;save()"/>
+    </div>
+    <div class="card">
+      <strong>Preferences</strong>
+      <input id="dietaryPrefs" placeholder="Dietary preferences (vegan, gluten-free...)" value="${(state.user.dietary||[]).join(', ')}" onchange="state.user.dietary=this.value.split(',').map(x=>x.trim()).filter(Boolean);save()"/>
+      <input id="allergyPrefs" placeholder="Allergies" value="${(state.user.allergies||[]).join(', ')}" onchange="state.user.allergies=this.value.split(',').map(x=>x.trim()).filter(Boolean);save()"/>
+    </div>
+    <div class="card">
+      <strong>Saved addresses</strong>
+      <input id="newAddress" placeholder="Add an address"/>
+      <button class="btn btn-secondary" onclick="addAddress()">Add address</button>
+      <div id="addressList" class="small" style="margin-top:8px">${(state.user.addresses||[]).map((a,i)=>`<div class="row"><span>${a}</span><button class="link-btn" onclick="removeAddress(${i})">Remove</button></div>`).join('')||'No saved addresses yet.'}</div>
+    </div>
+    <div class="card"><div class="row"><strong>Rewards</strong><button class="link-btn" onclick="showScreen('rewards')">${state.xp} XP</button></div></div>
+    ${orderHistoryHtml()}
+    <button class="btn btn-danger" onclick="signOut()">Sign out</button>`;
+}
+function addAddress(){const v=document.getElementById('newAddress').value.trim();if(!v)return;state.user.addresses=state.user.addresses||[];state.user.addresses.push(v);save();renderAccount()}
+function removeAddress(i){state.user.addresses.splice(i,1);save();renderAccount()}
+function orderHistoryHtml(){
+  return `<div class="section-head"><h3>Orders</h3></div>${state.orders.length?state.orders.map(o=>`<div class="card"><div class="row"><strong>${o.id}</strong><span class="badge gold">${o.status}</span></div><div class="small">${o.created} • ${money(o.total)} • ${o.method}</div></div>`).join(''):'<div class="soft-card"><span class="small">No orders yet.</span></div>'}`;
+}
+
+function rewardTier(){
+  const xp=state.xp;
+  if(xp>=1500)return ['Provo Market VIP',1500,1500];
+  if(xp>=700)return ['Harvest Club',700,1500];
+  if(xp>=300)return ['Market Member',300,700];
+  if(xp>=100)return ['Sprout',100,300];
+  return ['Seedling',0,100];
+}
+function renderRewardsMini(){
+  const [tier,min,max]=rewardTier(),xp=state.xp;
+  document.getElementById('homeTier').textContent=tier;document.getElementById('homeXP').textContent=xp;
+  const pct=max===min?100:Math.min(100,((xp-min)/(max-min))*100);
+  document.getElementById('homeXPBar').style.width=pct+'%';
+  document.getElementById('homeXPNext').textContent=tier==='Provo Market VIP'?'Top tier reached':`${max-xp} XP to next tier`;
+}
+function renderRewards(){
+  const [tier,min,max]=rewardTier(),pct=max===min?100:Math.min(100,((state.xp-min)/(max-min))*100);
+  document.getElementById('rewardsContent').innerHTML=`
+    <div class="hero"><div class="label">Current tier</div><h2>${tier}</h2><div style="font-size:34px;font-weight:900">${state.xp} XP</div><div class="progress" style="margin-top:12px"><div style="width:${pct}%"></div></div><div class="small" style="margin-top:8px">${tier==='Provo Market VIP'?'Top tier reached':`${max-state.xp} XP until the next tier`}</div></div>
+    <div class="card"><strong>How XP works</strong><p class="small">Planned rule: 1 XP per $1 spent after a payment is successfully verified. This prototype does not award XP for demo unpaid orders.</p></div>
+    <div class="card"><strong>Tier benefits</strong><p class="small">Seedling: normal access<br/>Sprout: occasional discounts<br/>Market Member: small discounts or bonus XP<br/>Harvest Club: reduced delivery fees or monthly reward<br/>Provo Market VIP: delivery credits, exclusive discounts, early access</p></div>
+    <div class="section-head"><h3>XP history</h3></div>
+    ${state.xpHistory.length?state.xpHistory.map(x=>`<div class="card">${x}</div>`).join(''):'<div class="soft-card"><span class="small">No XP transactions yet.</span></div>'}`;
+}
+
+function buildFinderInterestChips(){
+  const ints=['Food','Sweet treats','Flowers','Self-care','Art','Home','Outdoors','Jewelry','Healthy','Coffee'];
+  document.getElementById('finderInterestChips').innerHTML=ints.map(x=>`<button class="chip" onclick="this.classList.toggle('selected')">${x}</button>`).join('');
+}
+function finderTextMatch(p,q){
+  q=q.toLowerCase();
+  const searchable=[p.name,vendorFor(p).name,p.category,...p.tags,...p.dietary,...p.ingredients,...p.allergens].join(' ').toLowerCase();
+  return q.split(/\s+/).some(w=>w.length>2&&searchable.includes(w));
+}
+function runFinder(){
+  const q=document.getElementById('aiQuery').value.trim();
+  if(!q){document.getElementById('finderResults').innerHTML='<div class="soft-card">Type what you are looking for first.</div>';return}
+  const low=q.toLowerCase();
+  let max=999;
+  const m=low.match(/(?:under|below|less than)\s*\$?(\d+)/);if(m)max=Number(m[1]);
+  let list=products.filter(p=>p.price<=max);
+  if(low.includes('no dairy')||low.includes('dairy-free'))list=list.filter(p=>!p.allergens.includes('milk')&&!p.ingredients.join(' ').toLowerCase().includes('milk'));
+  if(low.includes('gluten-free')||low.includes('gluten free'))list=list.filter(p=>p.dietary.includes('gluten-free'));
+  if(low.includes('vegan'))list=list.filter(p=>p.dietary.includes('vegan'));
+  if(low.includes('vegetarian')||low.includes('healthy'))list=list.filter(p=>p.dietary.includes('vegetarian')||p.dietary.includes('vegan')||p.category==='Produce');
+  if(low.includes('delivery'))list=list.filter(p=>p.delivery);
+  if(low.includes('pickup'))list=list.filter(p=>p.pickup);
+  const matched=list.map(p=>({p,score:(finderTextMatch(p,q)?35:0)+p.rating*8+(p.popularity/10)})).sort((a,b)=>b.score-a.score).slice(0,5);
+  renderFinderResults(matched.map(x=>x.p),`Based only on products currently listed in this prototype. ${max<999?`Budget interpreted as under $${max}.`:''}`);
+}
+function runGuidedFinder(){
+  const selected=[...document.querySelectorAll('#finderInterestChips .selected')].map(x=>x.textContent.toLowerCase());
+  const custom=document.getElementById('finderCustom').value.trim().toLowerCase();
+  if(custom)selected.push(custom);
+  const max=Number(document.getElementById('finderBudget').value);
+  let scored=products.filter(p=>p.price<=max).map(p=>{
+    const text=[p.name,p.category,...p.tags,...p.dietary].join(' ').toLowerCase();
+    const matches=selected.filter(s=>text.includes(s.toLowerCase())).length;
+    return {p,score:matches*40+p.rating*8+p.popularity/10};
+  }).sort((a,b)=>b.score-a.score).slice(0,5);
+  renderFinderResults(scored.map(x=>x.p),`Guided match • ${document.getElementById('finderRecipient').value} • budget under $${max}`);
+}
+function renderFinderResults(list,note){
+  const total=list.reduce((s,p)=>s+p.price,0);
+  document.getElementById('finderResults').innerHTML=`<div class="soft-card"><strong>${list.length} recommended match${list.length===1?'':'es'}</strong><div class="small">${note}</div><div class="small" style="margin-top:5px">Estimated total if buying one of each: ${money(total)}</div></div>`+
+  (list.length?list.map((p,i)=>{
+    const v=vendorFor(p);
+    return `<div class="result-card"><span class="rank">${i===0?'Best match':`#${i+1}`}</span><span class="score">${Math.max(78,96-i*4)}% match</span><h3 style="margin-top:9px">${p.emoji} ${p.name}</h3><div class="vendor">${v.name}</div><div class="price">${money(p.price)}</div><div class="why"><strong>Why it fits:</strong> Matches your request using the product’s listed category, tags, price, dietary info, and availability.</div><div class="small" style="margin-top:7px">Pickup: ${p.pickup?'Yes':'No'} • Delivery: ${p.delivery?'Yes':'No'} • Prep: ${p.prep} min${p.allergens.length?` • Allergy warning: ${p.allergens.join(', ')}`:''}</div><button class="btn btn-secondary" onclick="openProduct('${p.id}')">View product</button></div>`;
+  }).join(''):'<div class="soft-card">No matching products found. Try broadening your request.</div>');
+}
+
+function openRoleSwitcher(){showScreen('roles')}
+function renderVendorDemo(){
+  document.getElementById('vendorProductList').innerHTML=products.filter(p=>p.vendorId==='peak').map(p=>`<div class="card"><div class="row"><div><strong>${p.name}</strong><div class="small">${money(p.price)} • ${p.stock} in stock</div></div><span class="badge">${p.stock>0?'Available':'Paused'}</span></div><button class="btn btn-secondary" onclick="toast('Product editor would open here.')">Edit product</button></div>`).join('');
+}
+let driverStep=0;
+function advanceDriverStatus(btn){
+  const steps=[...document.querySelectorAll('#driverDash .status-step')];
+  driverStep=Math.min(driverStep+1,steps.length-1);steps.forEach((s,i)=>s.classList.toggle('done',i<=driverStep));
+  toast(['Assigned','Picked up','Out for delivery','Delivered'][driverStep]||'Updated');
+  if(driverStep===steps.length-1)btn.disabled=true;
+}
+function saveAdminSettings(){
+  state.settings.maxMiles=Number(document.getElementById('adminRadius').value||30);
+  state.settings.freeDeliveryThreshold=Number(document.getElementById('adminFreeDeliveryThreshold').value||60);
+  state.settings.xpRate=Number(document.getElementById('adminXpRate').value||1);
+  save();toast('Admin settings saved in this browser.');
+}
+function renderAdmin(){
+  document.getElementById('adminRadius').value=state.settings.maxMiles;
+  document.getElementById('adminFreeDeliveryThreshold').value=state.settings.freeDeliveryThreshold;
+  document.getElementById('adminXpRate').value=state.settings.xpRate;
+  document.getElementById('adminOrders').textContent=state.orders.length;
+  document.getElementById('adminSales').textContent=money(state.orders.filter(o=>o.paid).reduce((s,o)=>s+o.total,0));
+  document.getElementById('adminOrderFees').innerHTML=state.orders.length
+    ? state.orders.map(o=>`<div class="card"><div class="row"><strong>${o.id}</strong><span class="badge gray">${o.method}</span></div><div class="small">Total: ${money(o.total)}${o.method==='delivery'?`<br/>Delivery fee charged: ${money(o.deliveryFee)}${o.deliveryDistance?` • ${o.deliveryDistance} mi`:''}`:''}</div></div>`).join('')
+    : '<div class="soft-card"><span class="small">No demo orders yet.</span></div>';
+  document.getElementById('adminVendorTable').innerHTML=vendors.map(v=>`<tr><td>${v.name}</td><td><span class="badge">${v.approved?'Approved':'Suspended'}</span></td><td><button class="link-btn" onclick="vToggle('${v.id}')">${v.approved?'Suspend':'Approve'}</button></td></tr>`).join('');
+}
+function vToggle(id){const v=vendors.find(x=>x.id===id);v.approved=!v.approved;renderAdmin();toast('Vendor status updated in demo.');}
+
+const oldShow=showScreen;
+showScreen=function(id){
+  oldShow(id);
+  if(id==='rewards')renderRewards();
+  if(id==='vendorDash')renderVendorDemo();
+  if(id==='adminDash')renderAdmin();
+  if(id==='account')renderAccount();
+  if(id==='wishlist')renderWishlist();
+  if(id==='bag')renderBag();
+};
+
+load();
+populateFilters();
+buildFinderInterestChips();
+setAuthUI();
+updateBagCount();
+renderHome();
+renderDiscover();
+</script>
+</body>
+</html>
